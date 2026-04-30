@@ -2,6 +2,8 @@
 
 API REST para o **FlowCred**, sistema de gestão de propostas de crédito imobiliário (MVP portfólio).
 
+**Documentação unificada** (comportamento do sistema, regras de negócio, APIs e tutoriais Git + uso da plataforma): [../DOCUMENTACAO-FlowCred.md](../DOCUMENTACAO-FlowCred.md)
+
 ## Tecnologias
 
 - Python 3.12, FastAPI, Uvicorn  
