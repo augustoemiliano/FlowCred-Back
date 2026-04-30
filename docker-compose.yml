@@ -23,6 +23,8 @@ services:
     container_name: flowcred_backend
     env_file:
       - .env
+    volumes:
+      - flowcred_uploads:/app/uploads
     ports:
       - "8000:8000"
     depends_on:
@@ -38,3 +40,4 @@ services:
 
 volumes:
   flowcred_postgres_data:
+  flowcred_uploads:

@@ -1,4 +1,4 @@
-from pydantic import field_validator
+from pydantic import computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -15,7 +15,17 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
 
-    BACKEND_CORS_ORIGINS: list[str] = []
+    BACKEND_CORS_ORIGINS: str = ""
+
+    JWT_SECRET_KEY: str
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+
+    INITIAL_ADMIN_EMAIL: str | None = None
+    INITIAL_ADMIN_PASSWORD: str | None = None
+
+    UPLOAD_DIR: str = "/app/uploads"
+    MAX_UPLOAD_BYTES: int = 10 * 1024 * 1024
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
@@ -24,14 +34,12 @@ class Settings(BaseSettings):
             f"@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
 
-    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
-    @classmethod
-    def parse_cors_origins(cls, value: str | list[str]) -> list[str]:
-        if isinstance(value, str):
-            if not value:
-                return []
-            return [item.strip() for item in value.split(",") if item.strip()]
-        return value
+    @computed_field
+    @property
+    def cors_origins_list(self) -> list[str]:
+        if not self.BACKEND_CORS_ORIGINS.strip():
+            return []
+        return [item.strip() for item in self.BACKEND_CORS_ORIGINS.split(",") if item.strip()]
 
 
 settings = Settings()
