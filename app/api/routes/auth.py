@@ -11,13 +11,13 @@ from app.schemas.auth import LoginRequest, TokenResponse, UserRead
 router = APIRouter()
 
 
-@router.post("/login", response_model=TokenResponse, summary="Login with email and password")
+@router.post("/login", response_model=TokenResponse, summary="Login com username e senha")
 def login(body: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
-    user = db.scalar(select(User).where(User.email == body.email.lower().strip()))
+    user = db.scalar(select(User).where(User.username == body.username))
     if user is None or not verify_password(body.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="Incorrect username or password",
         )
     if not user.is_active:
         raise HTTPException(

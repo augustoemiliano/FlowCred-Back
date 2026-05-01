@@ -1,21 +1,4 @@
 services:
-  db:
-    image: postgres:16-alpine
-    container_name: flowcred_db
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-flowcred}
-      POSTGRES_USER: ${POSTGRES_USER:-flowcred}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me}
-    ports:
-      - "5432:5432"
-    volumes:
-      - flowcred_postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-flowcred} -d ${POSTGRES_DB:-flowcred}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   backend:
     build:
       context: .
@@ -23,21 +6,21 @@ services:
     container_name: flowcred_backend
     env_file:
       - .env
+    environment:
+      DATABASE_URL: sqlite:////app/data/db.local
     volumes:
+      - flowcred_data:/app/data
       - flowcred_uploads:/app/uploads
     ports:
-      - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy
+      - "8001:8000"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')\""]
       interval: 20s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 15s
     restart: unless-stopped
 
 volumes:
-  flowcred_postgres_data:
+  flowcred_data:
   flowcred_uploads:

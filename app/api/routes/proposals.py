@@ -232,7 +232,7 @@ def get_history(
                 id=h.id,
                 proposal_id=h.proposal_id,
                 user_id=h.user_id,
-                user_email=h.user.email if h.user else None,
+                user_username=h.user.username if h.user else None,
                 action=str(h.action.value if hasattr(h.action, "value") else h.action),
                 old_status=h.old_status,
                 new_status=h.new_status,

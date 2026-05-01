@@ -18,7 +18,7 @@ class UserMinimal(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    email: str
+    username: str
 
 
 class ProposalCreate(BaseModel):
@@ -91,7 +91,7 @@ class ProposalHistoryRead(BaseModel):
     id: int
     proposal_id: int
     user_id: int
-    user_email: str | None = None
+    user_username: str | None = None
     action: str
     old_status: ProposalStatus | None
     new_status: ProposalStatus | None
