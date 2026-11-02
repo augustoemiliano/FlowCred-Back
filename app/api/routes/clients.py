@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_user
 from app.db.session import get_db
 from app.models.client import Client
+from app.models.proposal import Proposal
 from app.models.user import User
 from app.schemas.client import ClientCreate, ClientListResponse, ClientRead, ClientUpdate
 
@@ -72,7 +73,7 @@ def list_clients(
 
     total = db.scalar(count_stmt) or 0
     offset = (page - 1) * page_size
-    stmt = base.order_by(Client.created_at.desc()).offset(offset).limit(page_size)
+    stmt = base.order_by(Client.created_at.desc(), Client.id.desc()).offset(offset).limit(page_size)
     items = list(db.scalars(stmt).all())
     return ClientListResponse(
         items=items,
@@ -131,5 +132,11 @@ def delete_client(
     client = db.get(Client, client_id)
     if client is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cliente não encontrado")
+    has_proposals = db.scalar(select(func.count()).select_from(Proposal).where(Proposal.client_id == client_id))
+    if has_proposals:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cliente possui propostas vinculadas e não pode ser excluído",
+        )
     db.delete(client)
     db.commit()
