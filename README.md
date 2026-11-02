@@ -29,9 +29,17 @@ O [`render.yaml`](https://github.com/augustoemiliano/FlowCred-Back/blob/main/ren
 
 ## Screenshots
 
-> _Espaço reservado para capturas de tela (login, dashboard, lista de propostas, detalhe da proposta)._
->
-> <!-- Exemplo: ![Dashboard](docs/screenshots/dashboard.png) -->
+Telas do front-end ([FlowCred-Front](https://github.com/augustoemiliano/FlowCred-Front)) consumindo esta API:
+
+![Dashboard com indicadores e gráfico por etapa](https://raw.githubusercontent.com/augustoemiliano/FlowCred-Front/main/docs/screenshots/dashboard.png)
+
+| Propostas | Detalhe da proposta |
+|---|---|
+| ![Lista de propostas com filtros](https://raw.githubusercontent.com/augustoemiliano/FlowCred-Front/main/docs/screenshots/propostas.png) | ![Detalhe com checklist, documentos e histórico](https://raw.githubusercontent.com/augustoemiliano/FlowCred-Front/main/docs/screenshots/detalhe-proposta.png) |
+
+| Clientes | Login | Celular |
+|---|---|---|
+| ![Clientes](https://raw.githubusercontent.com/augustoemiliano/FlowCred-Front/main/docs/screenshots/clientes.png) | ![Login](https://raw.githubusercontent.com/augustoemiliano/FlowCred-Front/main/docs/screenshots/login.png) | <img src="https://raw.githubusercontent.com/augustoemiliano/FlowCred-Front/main/docs/screenshots/mobile.png" alt="Dashboard no celular" width="200"> |
 
 ## Stack
 
