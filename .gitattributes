@@ -1,0 +1,4 @@
+* text=auto
+# Scripts executados dentro do container Linux precisam de LF (evita "/bin/sh^M" em clones Windows).
+*.sh text eol=lf
+Dockerfile text eol=lf
