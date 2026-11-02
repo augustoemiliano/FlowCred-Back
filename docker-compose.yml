@@ -8,6 +8,7 @@ services:
       - .env
     environment:
       DATABASE_URL: sqlite:////app/data/db.local
+      UPLOAD_DIR: /app/uploads
     volumes:
       - flowcred_data:/app/data
       - flowcred_uploads:/app/uploads

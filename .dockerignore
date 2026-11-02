@@ -5,8 +5,15 @@ __pycache__/
 .Python
 .pytest_cache/
 .mypy_cache/
+.ruff_cache/
 .venv/
 venv/
 .env
+.env.*
+!.env.example
+db.local
+*.db
+uploads/
 .git
+.github
 .gitignore
