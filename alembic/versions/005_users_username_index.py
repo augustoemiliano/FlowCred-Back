@@ -11,7 +11,6 @@ Create Date: 2026-11-02
 """
 
 import sqlalchemy as sa
-
 from alembic import op
 
 revision = "005_users_username_index"
