@@ -1,0 +1,110 @@
+# Blueprint do Render (https://render.com/docs/blueprint-spec) — demo pública gratuita do FlowCred.
+#
+# Um único Blueprint cria os dois serviços:
+#   - flowcred-back  → API FastAPI (Docker, este repositório)        https://flowcred-back.onrender.com
+#   - flowcred-front → SPA React como static site (repo FlowCred-Front) https://flowcred-front.onrender.com
+#
+# Os URLs acima dependem de os nomes estarem livres no onrender.com. Se o Render atribuir outro
+# subdomínio (ex.: flowcred-back-abcd.onrender.com), ajuste no dashboard:
+#   - BACKEND_CORS_ORIGINS do flowcred-back  = URL real do front
+#   - VITE_API_URL do flowcred-front         = URL real do back + /api/v1  (e faça "Manual Deploy",
+#     porque o Vite embute a variável no build)
+#
+# Plano free: sem disco persistente. O SQLite fica no sistema de ficheiros efémero do container,
+# por isso os dados (e uploads) voltam ao estado do seed a cada deploy, reinício ou hibernação
+# (o serviço free hiberna após ~15 min sem tráfego). Para uma demo isto é desejável: qualquer
+# alteração feita por visitantes desaparece sozinha.
+
+services:
+  # ---------------------------------------------------------------- API (Docker)
+  - type: web
+    name: flowcred-back
+    runtime: docker
+    plan: free
+    # Não há região na América do Sul; virginia (us-east) é a de menor latência para o Brasil.
+    region: virginia
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/v1/health
+    envVars:
+      # O Render injeta PORT (10000); o entrypoint usa ${PORT:-8000}.
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: sqlite:////app/data/db.local
+      - key: UPLOAD_DIR
+        value: /app/uploads
+      # Uploads pequenos na demo (2 MB): o disco é efémero e partilhado com o SQLite.
+      - key: MAX_UPLOAD_BYTES
+        value: "2097152"
+      # Utilizador da demo (mostrado na tela de login do front). A API não tem rotas
+      # administrativas: is_superuser só serve para o seed atribuir as propostas demo.
+      - key: INITIAL_ADMIN_USERNAME
+        value: demo
+      - key: INITIAL_ADMIN_PASSWORD
+        value: demo
+      - key: SEED_DEV_DATA
+        value: "1"
+      - key: BACKEND_CORS_ORIGINS
+        value: https://flowcred-front.onrender.com
+      # Swagger/ReDoc/OpenAPI desligados na demo pública. Mude para "1" se quiser expô-los.
+      - key: ENABLE_API_DOCS
+        value: "0"
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+
+      # --- Opção: Postgres free do Render (dados sobrevivem a reinícios) ---
+      # Descomente o bloco `databases` no fim do ficheiro e troque DATABASE_URL acima por:
+      # - key: DATABASE_URL
+      #   fromDatabase:
+      #     name: flowcred-db
+      #     property: connectionString
+      # (postgres:// é convertido automaticamente para postgresql+psycopg://.)
+      # Atenção: o Postgres free do Render expira 30 dias após a criação.
+
+  # ---------------------------------------------------------------- Front (static site)
+  - type: web
+    name: flowcred-front
+    runtime: static
+    repo: https://github.com/augustoemiliano/FlowCred-Front
+    branch: main
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # O Vite embute estas variáveis no build (mudou? faça um novo deploy do front).
+      - key: VITE_API_URL
+        value: https://flowcred-back.onrender.com/api/v1
+      - key: VITE_SHOW_DEMO_LOGIN
+        value: "true"
+      - key: VITE_DEMO_USERNAME
+        value: demo
+      - key: VITE_DEMO_PASSWORD
+        value: demo
+    routes:
+      # SPA: qualquer rota (ex.: /propostas/3) devolve o index.html; o React Router trata no cliente.
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+
+# databases:
+#   - name: flowcred-db
+#     plan: free
+#     region: virginia
+#     databaseName: flowcred
+#     user: flowcred

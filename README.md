@@ -6,6 +6,27 @@ API REST do **FlowCred**, um sistema de gestão de propostas de **crédito imobi
 
 O frontend (React + TypeScript) fica no repositório [FlowCred-Front](https://github.com/augustoemiliano/FlowCred-Front).
 
+## Demo online
+
+- **App:** https://flowcred-front.onrender.com (usuário `demo` / senha `demo`)
+- **API:** https://flowcred-back.onrender.com/api/v1/health
+
+> Links previstos pelo `render.yaml`; ficam ativos depois que o Blueprint for aplicado no Render.
+
+Na demo pública o Swagger/ReDoc ficam desligados (`ENABLE_API_DOCS=0`), os uploads limitados a 2 MB e o `JWT_SECRET_KEY` é gerado pelo Render.
+
+### Como publicar (dono do repositório)
+
+O [`render.yaml`](https://github.com/augustoemiliano/FlowCred-Back/blob/main/render.yaml) do FlowCred-Back é um *Blueprint* que cria **os dois serviços** (API e front) de uma vez:
+
+1. Crie uma conta em [render.com](https://render.com) com **Sign in with GitHub** e autorize o app do Render a acessar **os dois repositórios** (`FlowCred-Back` e `FlowCred-Front`).
+2. No dashboard: **New → Blueprint**.
+3. Escolha o repositório **FlowCred-Back** (branch `main`); o Render lê o `render.yaml` e lista `flowcred-back` (Docker, free) e `flowcred-front` (static site).
+4. Clique em **Apply** (nenhum cartão é necessário no plano free) e aguarde o primeiro deploy (~5 min).
+5. Abra https://flowcred-front.onrender.com e entre com `demo` / `demo`. Se o Render tiver atribuído outro subdomínio a algum serviço, ajuste `BACKEND_CORS_ORIGINS` (back) e `VITE_API_URL` (front) no dashboard e faça **Manual Deploy** do front.
+
+> **Plano free:** a API hiberna após ~15 min sem acesso, e o primeiro acesso depois disso demora **~1 min** (o front mostra erro de conexão até ela acordar; basta tentar de novo). Não há disco persistente: o banco SQLite e os uploads **voltam aos dados demo a cada deploy, reinício ou hibernação**. Para manter dados, o `render.yaml` traz comentada a opção de Postgres free do Render (expira após 30 dias).
+
 ## Screenshots
 
 > _Espaço reservado para capturas de tela (login, dashboard, lista de propostas, detalhe da proposta)._
@@ -91,7 +112,7 @@ Para subir o frontend junto, veja o README do [FlowCred-Front](https://github.co
 ## Testes e qualidade
 
 ```bash
-pytest                 # 39 testes: auth, CORS, clientes, propostas, checklist, documentos, dashboard, seed
+pytest                 # 44 testes: auth, CORS, config, clientes, propostas, checklist, documentos, dashboard, seed
 ruff check .           # lint
 ruff format --check .  # formatação
 alembic check          # modelos e migrações em sincronia
@@ -108,7 +129,7 @@ Todas estão documentadas em [`.env.example`](.env.example).
 | Variável | Padrão | Descrição |
 |----------|--------|-----------|
 | `PROJECT_NAME`, `PROJECT_VERSION`, `API_V1_PREFIX` | `FlowCred API`, `0.1.0`, `/api/v1` | Metadados e prefixo das rotas |
-| `DATABASE_URL` | vazio → `sqlite:///./db.local` | URI SQLAlchemy; no Docker é `sqlite:////app/data/db.local` |
+| `DATABASE_URL` | vazio → `sqlite:///./db.local` | URI SQLAlchemy; no Docker é `sqlite:////app/data/db.local`. `postgres://…` é convertido para `postgresql+psycopg://…` |
 | `POSTGRES_SERVER`, `POSTGRES_PORT`, `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | vazio | PostgreSQL opcional (usado se `DATABASE_URL` estiver vazio) |
 | `BACKEND_CORS_ORIGINS` | `http://localhost:5173,…` | Origens permitidas, separadas por vírgula |
 | `JWT_SECRET_KEY` | — (obrigatória, ≥ 16 caracteres) | Segredo HS256 dos tokens |
@@ -118,6 +139,8 @@ Todas estão documentadas em [`.env.example`](.env.example).
 | `SEED_DEV_DATA` | `1` no exemplo | `1` carrega os dados demo; `0` em produção |
 | `UPLOAD_DIR` | `./uploads` | Diretório dos arquivos enviados (`/app/uploads` no Docker) |
 | `MAX_UPLOAD_BYTES` | `10485760` | Limite por arquivo (10 MB) |
+| `ENABLE_API_DOCS` | `1` | `0` desliga `/docs`, `/redoc` e `/openapi.json` (usado na demo do Render) |
+| `PORT` | `8000` | Porta do uvicorn no container (o Render injeta `10000`) |
 
 ## Endpoints (prefixo `/api/v1`)
 

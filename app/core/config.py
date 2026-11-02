@@ -2,6 +2,14 @@ from pydantic import Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+def _normalize_db_url(url: str) -> str:
+    """Provedores como o Render entregam `postgres://`/`postgresql://`; o driver instalado é o psycopg 3."""
+    for prefix in ("postgres://", "postgresql://"):
+        if url.startswith(prefix):
+            return "postgresql+psycopg://" + url[len(prefix) :]
+    return url
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -38,10 +46,13 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "./uploads"
     MAX_UPLOAD_BYTES: int = 10 * 1024 * 1024
 
+    # Swagger (/docs), ReDoc (/redoc) e /openapi.json. Desligue em demos públicas/produção.
+    ENABLE_API_DOCS: bool = True
+
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         if self.DATABASE_URL and self.DATABASE_URL.strip():
-            return self.DATABASE_URL.strip()
+            return _normalize_db_url(self.DATABASE_URL.strip())
         if self.POSTGRES_SERVER.strip() and self.POSTGRES_DB.strip() and self.POSTGRES_USER.strip():
             return (
                 f"postgresql+psycopg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"

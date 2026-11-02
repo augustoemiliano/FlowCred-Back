@@ -7,4 +7,5 @@ if [ -n "${INITIAL_ADMIN_USERNAME:-}" ] && [ -n "${INITIAL_ADMIN_PASSWORD:-}" ];
   python -m app.scripts.ensure_admin
 fi
 python -m app.scripts.seed_dev_demo
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+# Render (e outros PaaS) injetam PORT; no compose/CI fica 8000.
+exec uvicorn app.main:app --host 0.0.0.0 --port "${PORT:-8000}"
