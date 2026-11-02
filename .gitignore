@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Ambientes virtuais
+.venv/
+venv/
+
+# Configuração local (use .env.example como modelo)
+.env
+.env.*
+!.env.example
+
+# Base de dados SQLite e uploads locais
+*.db
+*.sqlite
+*.sqlite3
+db.local
+db.local-journal
+uploads/
+
+# Editores / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
