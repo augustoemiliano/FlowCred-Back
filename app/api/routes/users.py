@@ -10,7 +10,7 @@ from app.schemas.proposal import UserMinimal
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.get("", response_model=list[UserMinimal], summary="Listar utilizadores ativos (para escolher responsável)")
+@router.get("", response_model=list[UserMinimal], summary="Listar usuários ativos (para escolher responsável)")
 def list_users(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),

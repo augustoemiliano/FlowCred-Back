@@ -12,7 +12,7 @@ class LoginRequest(BaseModel):
     def normalize_username(cls, v: str) -> str:
         s = v.strip().lower()
         if not s:
-            raise ValueError("Utilizador inválido")
+            raise ValueError("Usuário inválido")
         return s
 
 

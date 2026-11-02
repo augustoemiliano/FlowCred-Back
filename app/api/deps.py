@@ -18,7 +18,7 @@ def get_current_user(
     if payload is None or "sub" not in payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail="Credenciais inválidas ou sessão expirada",
             headers={"WWW-Authenticate": "Bearer"},
         )
     try:
@@ -26,7 +26,7 @@ def get_current_user(
     except (TypeError, ValueError) as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail="Credenciais inválidas ou sessão expirada",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
@@ -34,7 +34,7 @@ def get_current_user(
     if user is None or not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail="Credenciais inválidas ou sessão expirada",
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
