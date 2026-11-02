@@ -1,0 +1,22 @@
+[project]
+name = "flowcred-back"
+version = "0.1.0"
+description = "API REST do FlowCred — gestão de propostas de crédito imobiliário"
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+# B008: Depends()/Query()/File() em defaults é o padrão do FastAPI.
+ignore = ["B008"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

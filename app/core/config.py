@@ -41,11 +41,7 @@ class Settings(BaseSettings):
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         if self.DATABASE_URL and self.DATABASE_URL.strip():
             return self.DATABASE_URL.strip()
-        if (
-            self.POSTGRES_SERVER.strip()
-            and self.POSTGRES_DB.strip()
-            and self.POSTGRES_USER.strip()
-        ):
+        if self.POSTGRES_SERVER.strip() and self.POSTGRES_DB.strip() and self.POSTGRES_USER.strip():
             return (
                 f"postgresql+psycopg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
                 f"@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"

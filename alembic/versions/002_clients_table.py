@@ -7,6 +7,7 @@ Create Date: 2026-04-30
 """
 
 import sqlalchemy as sa
+
 from alembic import op
 
 revision = "002_clients_table"

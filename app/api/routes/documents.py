@@ -32,4 +32,3 @@ def download_document(
         media_type=doc.mime_type,
         filename=doc.display_name,
     )
-

@@ -21,22 +21,14 @@ def dashboard_summary(
 ) -> DashboardSummary:
     total = db.scalar(select(func.count()).select_from(Proposal)) or 0
     em_analise = (
-        db.scalar(
-            select(func.count()).select_from(Proposal).where(Proposal.status == ProposalStatus.ANALISE_CREDITO)
-        )
+        db.scalar(select(func.count()).select_from(Proposal).where(Proposal.status == ProposalStatus.ANALISE_CREDITO))
         or 0
     )
     juridico = (
-        db.scalar(
-            select(func.count()).select_from(Proposal).where(Proposal.status == ProposalStatus.JURIDICO)
-        )
-        or 0
+        db.scalar(select(func.count()).select_from(Proposal).where(Proposal.status == ProposalStatus.JURIDICO)) or 0
     )
     finalizadas = (
-        db.scalar(
-            select(func.count()).select_from(Proposal).where(Proposal.status == ProposalStatus.FINALIZADO)
-        )
-        or 0
+        db.scalar(select(func.count()).select_from(Proposal).where(Proposal.status == ProposalStatus.FINALIZADO)) or 0
     )
     total_financed = db.scalar(select(func.coalesce(func.sum(Proposal.financed_amount), 0))) or Decimal("0")
 

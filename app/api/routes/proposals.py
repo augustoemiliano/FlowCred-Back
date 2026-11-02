@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
-from sqlalchemy import func, or_, select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
@@ -17,6 +17,7 @@ from app.models.user import User
 from app.schemas.checklist import ChecklistItemRead
 from app.schemas.document import DocumentRead
 from app.schemas.proposal import (
+    ClientMinimal,
     ProposalCreate,
     ProposalDetailRead,
     ProposalHistoryRead,
@@ -24,7 +25,6 @@ from app.schemas.proposal import (
     ProposalRead,
     ProposalStatusPatch,
     ProposalUpdate,
-    ClientMinimal,
     UserMinimal,
 )
 from app.services.checklist_seed import seed_default_checklist
@@ -144,9 +144,7 @@ def list_documents(
     _get_proposal_or_404(db, proposal_id)
     return list(
         db.scalars(
-            select(Document)
-            .where(Document.proposal_id == proposal_id)
-            .order_by(Document.created_at.desc())
+            select(Document).where(Document.proposal_id == proposal_id).order_by(Document.created_at.desc())
         ).all()
     )
 

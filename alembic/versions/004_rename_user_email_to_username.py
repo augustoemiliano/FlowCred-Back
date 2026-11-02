@@ -7,6 +7,7 @@ Create Date: 2026-05-01
 """
 
 import sqlalchemy as sa
+
 from alembic import op
 
 revision = "004_rename_user_email_to_username"
