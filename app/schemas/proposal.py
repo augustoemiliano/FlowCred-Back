@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from decimal import Decimal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.models.enums import ProposalStatus
 
@@ -21,36 +21,36 @@ class UserMinimal(BaseModel):
     username: str
 
 
-class ProposalCreate(BaseModel):
+class _ProposalFields(BaseModel):
     client_id: int = Field(ge=1)
     bank: str = Field(min_length=1, max_length=255)
-    property_value: Decimal = Field(gt=0)
-    financed_amount: Decimal = Field(gt=0)
+    property_value: Decimal = Field(gt=0, max_digits=14, decimal_places=2)
+    financed_amount: Decimal = Field(gt=0, max_digits=14, decimal_places=2)
+    responsible_user_id: int = Field(ge=1)
+    next_stage_date: date | None = None
+    notes: str | None = Field(default=None, max_length=20000)
+
+    @field_validator("bank")
+    @classmethod
+    def strip_bank(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Banco obrigatório")
+        return v
+
+    @model_validator(mode="after")
+    def financed_not_above_property(self):
+        if self.financed_amount > self.property_value:
+            raise ValueError("O valor financiado não pode ser maior que o valor do imóvel")
+        return self
+
+
+class ProposalCreate(_ProposalFields):
     status: ProposalStatus = ProposalStatus.ANALISE_CREDITO
-    responsible_user_id: int = Field(ge=1)
-    next_stage_date: date | None = None
-    notes: str | None = Field(default=None, max_length=20000)
-
-    @field_validator("bank")
-    @classmethod
-    def strip_bank(cls, v: str) -> str:
-        return v.strip()
 
 
-class ProposalUpdate(BaseModel):
-    client_id: int = Field(ge=1)
-    bank: str = Field(min_length=1, max_length=255)
-    property_value: Decimal = Field(gt=0)
-    financed_amount: Decimal = Field(gt=0)
-    responsible_user_id: int = Field(ge=1)
-    next_stage_date: date | None = None
-    notes: str | None = Field(default=None, max_length=20000)
+class ProposalUpdate(_ProposalFields):
     observation: str | None = Field(default=None, max_length=2000, description="Observação para o histórico")
-
-    @field_validator("bank")
-    @classmethod
-    def strip_bank(cls, v: str) -> str:
-        return v.strip()
 
 
 class ProposalStatusPatch(BaseModel):
@@ -79,7 +79,7 @@ class ProposalDetailRead(ProposalRead):
 
 
 class ProposalListResponse(BaseModel):
-    items: list[ProposalRead]
+    items: list[ProposalDetailRead]
     total: int
     page: int
     page_size: int
