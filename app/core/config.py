@@ -24,7 +24,7 @@ class Settings(BaseSettings):
 
     BACKEND_CORS_ORIGINS: str = ""
 
-    JWT_SECRET_KEY: str
+    JWT_SECRET_KEY: str = Field(min_length=16)
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
@@ -34,7 +34,8 @@ class Settings(BaseSettings):
     # 1 / true / yes: após migrations/admin, cria cliente + proposta demo (idempotente).
     SEED_DEV_DATA: bool = False
 
-    UPLOAD_DIR: str = "/app/uploads"
+    # Dev local: ./uploads. No Docker o compose define /app/uploads (volume).
+    UPLOAD_DIR: str = "./uploads"
     MAX_UPLOAD_BYTES: int = 10 * 1024 * 1024
 
     @property
